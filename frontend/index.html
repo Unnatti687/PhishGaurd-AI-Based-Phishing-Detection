@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishGuard - AI-Based Phishing Website Detection | SRM IST</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-shield">🛡️</div>
+        <div>
+          <h1 class="brand-title">PhishGuard</h1>
+          <p class="brand-subtitle">AI-Based Phishing Website Detection &bull; SRM IST</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div class="api-status-badge" id="apiStatusBadge">
+          <span class="status-dot online"></span>
+          <span id="apiStatusText">API Online</span>
+        </div>
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+          <span id="themeIcon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    <!-- Tab Controls -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="scannerTab">URL Scanner</button>
+      <button class="tab-btn" data-tab="bulkTab">Bulk Scanner</button>
+      <button class="tab-btn" data-tab="modelsTab">Model Benchmark</button>
+      <button class="tab-btn" data-tab="aboutTab">About & Methodology</button>
+    </nav>
+
+    <!-- TAB 1: SINGLE URL SCANNER -->
+    <section id="scannerTab" class="tab-content active">
+      <!-- Summary Metric Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total URLs Scanned</span>
+          <span class="stat-value" id="statTotalScanned">0</span>
+          <span class="stat-sub">Session queries</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Phishing Flagged</span>
+          <span class="stat-value text-danger" id="statPhishingCount">0</span>
+          <span class="stat-sub">High / Medium risk</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Legitimate Sites</span>
+          <span class="stat-value text-success" id="statSafeCount">0</span>
+          <span class="stat-sub">Verified safe URLs</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Average Confidence</span>
+          <span class="stat-value" id="statAvgConfidence">--%</span>
+          <span class="stat-sub">Model certainty</span>
+        </div>
+      </div>
+
+      <!-- Scanner Input Card -->
+      <div class="card scanner-card">
+        <h2 class="card-title">Analyze Web Page URL</h2>
+        <p class="card-desc">Enter any website link to evaluate its lexical, structural, and character entropy features. Inference operates in strict real-time URL-only mode without fetching external web pages.</p>
+        
+        <div class="input-group">
+          <input type="text" id="urlInput" class="url-input" placeholder="e.g. http://secure-login.paypa1-verify.com/update@id" autocomplete="off" spellcheck="false">
+          <button id="scanBtn" class="btn btn-primary">
+            <span id="scanBtnText">Scan URL</span>
+            <div id="scanSpinner" class="spinner hidden"></div>
+          </button>
+        </div>
+
+        <!-- Sample Trial Links -->
+        <div class="trial-links-container">
+          <span class="trial-label">Quick Test Links:</span>
+          <button class="trial-btn trial-safe" data-url="https://www.srmist.edu.in">SRM IST (Safe)</button>
+          <button class="trial-btn trial-safe" data-url="https://github.com/torvalds/linux">GitHub (Safe)</button>
+          <button class="trial-btn trial-safe" data-url="https://en.wikipedia.org/wiki/Phishing">Wikipedia (Safe)</button>
+          <button class="trial-btn trial-phish" data-url="http://appleid.apple.com-app.es/">Apple ID Phish (Risky)</button>
+          <button class="trial-btn trial-phish" data-url="http://174.139.46.123/ap/signin?openid=verify&amp;key=user@domain.com">IP Signin Phish (Risky)</button>
+          <button class="trial-btn trial-phish" data-url="http://secure-login.paypa1-verify.com/update@id">PayPal Lure (Risky)</button>
+        </div>
+      </div>
+
+      <!-- Result Card (Hidden until scan is clicked) -->
+      <div id="resultCard" class="card result-card hidden">
+        <div class="result-header">
+          <div>
+            <span class="badge" id="verdictBadge">Verdict</span>
+            <h3 class="result-url" id="resultUrlText">--</h3>
+          </div>
+          <div class="score-display">
+            <div class="score-number" id="riskScoreNumber">0%</div>
+            <div class="score-label">Phishing Risk Score</div>
+          </div>
+        </div>
+
+        <!-- Risk Bar -->
+        <div class="risk-bar-track">
+          <div id="riskBarFill" class="risk-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div class="risk-legend">
+          <span>0% Safe</span>
+          <span>35% Suspicious</span>
+          <span>70% High Risk</span>
+          <span>100% Critical</span>
+        </div>
+
+        <!-- Explanation Reasons Grid -->
+        <div class="reasons-section">
+          <h4 class="section-heading">Model Explanation & Key Risk Indicators</h4>
+          <div id="reasonsList" class="reasons-list">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Extracted Features Table -->
+        <div class="features-section">
+          <div class="features-header-toggle" id="featuresToggle">
+            <h4 class="section-heading">Extracted URL Features (<span id="featuresCountText">0</span> parameters)</h4>
+            <span class="toggle-icon" id="featuresToggleIcon">▼ View Breakdown</span>
+          </div>
+          <div id="featuresTableContainer" class="features-table-wrapper hidden">
+            <table class="features-table">
+              <thead>
+                <tr>
+                  <th>Feature Name</th>
+                  <th>Extracted Value</th>
+                  <th>Category</th>
+                  <th>Security Context</th>
+                </tr>
+              </thead>
+              <tbody id="featuresTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics and History Split -->
+      <div class="grid-2col">
+        <!-- Scan Distribution Doughnut -->
+        <div class="card">
+          <h3 class="card-title">Session Threat Distribution</h3>
+          <p class="card-desc">Visual breakdown of safe versus malicious URLs evaluated in this session.</p>
+          <div class="chart-container">
+            <canvas id="threatDoughnut" width="220" height="220"></canvas>
+            <div class="chart-center-text" id="chartCenterText">
+              <span class="chart-pct" id="chartCenterPct">0%</span>
+              <span class="chart-sub">Malicious</span>
+            </div>
+          </div>
+          <div class="chart-legend" id="chartLegend">
+            <div class="legend-item"><span class="legend-color safe-bg"></span> Safe (<span id="legSafe">0</span>)</div>
+            <div class="legend-item"><span class="legend-color susp-bg"></span> Suspicious (<span id="legSusp">0</span>)</div>
+            <div class="legend-item"><span class="legend-color phish-bg"></span> Phishing (<span id="legPhish">0</span>)</div>
+          </div>
+        </div>
+
+        <!-- Scan History Log -->
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <h3 class="card-title">Recent Scan History</h3>
+              <p class="card-desc">Audit trail of previously scanned URLs.</p>
+            </div>
+            <div class="history-actions">
+              <button id="exportCsvBtn" class="btn btn-secondary btn-sm">Export CSV</button>
+              <button id="clearHistoryBtn" class="btn btn-outline btn-sm">Clear</button>
+            </div>
+          </div>
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>Target URL</th>
+                  <th>Verdict</th>
+                  <th>Risk Score</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="4" class="empty-state">No URLs scanned yet. Run a scan above or select a trial link.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BULK SCANNER -->
+    <section id="bulkTab" class="tab-content">
+      <div class="card">
+        <h2 class="card-title">Bulk URL Scanner (Up to 50 URLs)</h2>
+        <p class="card-desc">Paste a list of URLs (one per line) to evaluate batch traffic or security threat feeds rapidly.</p>
+
+        <textarea id="bulkTextarea" class="bulk-textarea" rows="8" placeholder="https://example.com&#10;http://phishing-site.test/login&#10;https://www.wikipedia.org"></textarea>
+
+        <div class="bulk-controls">
+          <button id="bulkScanBtn" class="btn btn-primary">
+            <span id="bulkBtnText">Scan All URLs</span>
+            <div id="bulkSpinner" class="spinner hidden"></div>
+          </button>
+          <button id="bulkLoadSampleBtn" class="btn btn-secondary">Load Sample Batch</button>
+          <button id="bulkClearBtn" class="btn btn-outline">Clear Text</button>
+        </div>
+
+        <!-- Bulk Results Output -->
+        <div id="bulkResultsContainer" class="bulk-results-area hidden">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Total Processed</span>
+              <span class="stat-value" id="bulkTotal">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Phishing Flagged</span>
+              <span class="stat-value text-danger" id="bulkPhish">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Suspicious</span>
+              <span class="stat-value text-warning" id="bulkSusp">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Safe Verified</span>
+              <span class="stat-value text-success" id="bulkSafe">0</span>
+            </div>
+          </div>
+
+          <div class="history-table-wrapper">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>URL</th>
+                  <th>Verdict</th>
+                  <th>Risk Score</th>
+                  <th>Primary Indicator</th>
+                </tr>
+              </thead>
+              <tbody id="bulkTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MODEL BENCHMARK -->
+    <section id="modelsTab" class="tab-content">
+      <div class="card">
+        <h2 class="card-title">Machine Learning Benchmark & Performance Evaluation</h2>
+        <p class="card-desc">Rigorous offline evaluation on the official Hannousse & Yahiouche benchmark dataset (11,430 URLs, 50/50 balanced). Evaluated on an untouched stratified 20% test holdout (2,286 samples).</p>
+
+        <!-- Benchmark Table -->
+        <div class="history-table-wrapper">
+          <table class="history-table highlight-table" id="benchmarkTable">
+            <thead>
+              <tr>
+                <th>Classifier Algorithm</th>
+                <th>5-Fold CV F1</th>
+                <th>Test Accuracy</th>
+                <th>Test Precision</th>
+                <th>Test Recall</th>
+                <th>Test F1 Score</th>
+                <th>ROC-AUC</th>
+                <th>Latency (ms/URL)</th>
+              </tr>
+            </thead>
+            <tbody id="benchmarkTableBody">
+              <!-- Loaded from metrics.csv via API or fallback -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Plots Gallery Grid -->
+      <div class="grid-2col">
+        <div class="card">
+          <h3 class="card-title">ROC Curves Comparison</h3>
+          <p class="card-desc">True positive rate against false positive rate across decision thresholds.</p>
+          <div class="plot-box">
+            <img src="/results/roc_curves.png" alt="ROC Curves" class="plot-img" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23eee%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 fill=%22%23555%22>Run train.py to generate ROC plot</text></svg>'">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Confusion Matrices (2x2 Grid)</h3>
+          <p class="card-desc">True vs predicted distributions (TN, FP, FN, TP) for all four models.</p>
+          <div class="plot-box">
+            <img src="/results/confusion_matrices.png" alt="Confusion Matrices" class="plot-img" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23eee%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 fill=%22%23555%22>Run train.py to generate confusion matrices</text></svg>'">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Top 15 Feature Importances & Weights</h3>
+          <p class="card-desc">Random Forest Gini importance vs Logistic Regression linear coefficients.</p>
+          <div class="plot-box">
+            <img src="/results/feature_importance.png" alt="Feature Importance" class="plot-img" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23eee%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 fill=%22%23555%22>Run train.py to generate feature importance</text></svg>'">
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Overall Metric Benchmark Bar Chart</h3>
+          <p class="card-desc">Direct side-by-side comparison across Accuracy, Precision, Recall, and F1.</p>
+          <div class="plot-box">
+            <img src="/results/model_comparison_bar.png" alt="Model Comparison" class="plot-img" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22200%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23eee%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 fill=%22%23555%22>Run train.py to generate comparison bar chart</text></svg>'">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ABOUT & METHODOLOGY -->
+    <section id="aboutTab" class="tab-content">
+      <div class="card">
+        <h2 class="card-title">Project Overview & Academic Context</h2>
+        <div class="authors-badge">
+          <span><strong>Project:</strong> AI-Based Phishing Website Detection</span> &bull; 
+          <span><strong>Authors:</strong> Daksh Jaiswal (RA2411003030048) & Unnatti Dixit (RA2411003030009)</span> &bull; 
+          <span><strong>Institution:</strong> SRM Institute of Science and Technology</span>
+        </div>
+
+        <h3 class="sub-heading">Problem Statement</h3>
+        <p>Phishing attacks deceive users into relinquishing sensitive credentials and financial tokens. Conventional defense techniques (static blocklists, manual heuristics, signature matching) suffer from acute latency gaps: empirical studies show over 63% of phishing campaigns conclude within 2 hours, while blacklists catch under 20% of fresh phish at hour zero.</p>
+
+        <h3 class="sub-heading">Scope & Design Principles</h3>
+        <ul class="styled-list">
+          <li><strong>Pure URL-Only Features:</strong> Extraction relies entirely on raw URL strings (lengths, punctuation, entropy, keywords, digit ratios). No DOM scraping, HTML parsing, or runtime WHOIS lookups.</li>
+          <li><strong>Zero Network Dependency at Prediction:</strong> Prevents network latency overhead and eliminates privacy/evasion leaks to adversary servers.</li>
+          <li><strong>Controlled Offline Evaluation:</strong> Evaluated on the benchmark dataset from Hannousse & Yahiouche (2021) with identical stratified splits.</li>
+          <li><strong>Explainability First:</strong> Transparent risk scoring with granular feature explanations to enable user verification.</li>
+        </ul>
+
+        <h3 class="sub-heading">Limitations & Honest Security Boundaries</h3>
+        <div class="alert-box">
+          <p><strong>A "Legitimate" classification does NOT guarantee absolute safety:</strong> Attackers can compromise reputable domains or deploy compromised subdomains that mimic benign lexical patterns. Detection operates as an advisory layer, not a replacement for multi-factor authentication (MFA) and endpoint defense.</p>
+        </div>
+
+        <h3 class="sub-heading">Future Scope</h3>
+        <ol class="styled-list">
+          <li><strong>Lightweight Page-Content Signals:</strong> Selectively ingest HTML metadata (e.g. login form targets, external favicon links) if latency budget allows.</li>
+          <li><strong>Deep Learning Sequences:</strong> Character-level and subword CNNs/Transformers (such as URLNet) trained on larger streaming feeds.</li>
+          <li><strong>Continuous Concept-Drift Retraining:</strong> Automated pipelines to digest daily PhishTank/OpenPhish feeds and update weights dynamically.</li>
+          <li><strong>Cross-Dataset Generalization:</strong> Training on one distribution (e.g. Hannousse 2021) and validating robustness on independent enterprise telemetry.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <p>&copy; 2026 PhishGuard &bull; SRM Institute of Science and Technology &bull; Daksh Jaiswal & Unnatti Dixit</p>
+      <p class="footer-sub">Built with Python, Scikit-Learn, Flask & Vanilla Modern Frontend</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

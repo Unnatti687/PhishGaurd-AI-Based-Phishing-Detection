@@ -1,0 +1,53 @@
+{
+  "Random_Forest": {
+    "nb_www": 0.10284630508760517,
+    "char_entropy": 0.071324859625158,
+    "ratio_digits_url": 0.06672922918725464,
+    "char_repeat_max": 0.06598828756443868,
+    "longest_word_len": 0.06367189443652858,
+    "suspicious_keywords_count": 0.06282660888617819,
+    "path_length": 0.057051819222089246,
+    "hostname_length": 0.05075283081002273,
+    "url_length": 0.05044555335235984,
+    "nb_slash": 0.05033839215214835,
+    "nb_hyphens": 0.04825012221355142,
+    "avg_word_len": 0.046951531129075755,
+    "ratio_digits_host": 0.038738081546404075,
+    "nb_subdomains": 0.03708367152017107,
+    "nb_dots": 0.034467487678895556
+  },
+  "Decision_Tree": {
+    "nb_www": 0.2408937888739298,
+    "suspicious_keywords_count": 0.09265806410136881,
+    "longest_word_len": 0.08085013387466758,
+    "ratio_digits_url": 0.0745844500976069,
+    "nb_hyphens": 0.06235435550302056,
+    "path_length": 0.05629988109051348,
+    "nb_slash": 0.05059071552076694,
+    "nb_dots": 0.046486407408409335,
+    "url_length": 0.04458973584534807,
+    "hostname_length": 0.04015608112307849,
+    "char_entropy": 0.036344782739641736,
+    "nb_subdomains": 0.02604227880275987,
+    "tld_length": 0.025426178835643923,
+    "avg_word_len": 0.023076982426461428,
+    "ratio_digits_host": 0.02217665566544826
+  },
+  "Logistic_Regression": {
+    "longest_word_len": 3.094585760905763,
+    "nb_semicolon": 1.5535727063781464,
+    "suspicious_keywords_count": 1.2218423210323937,
+    "nb_at": 1.196681121629528,
+    "nb_hyphens": -1.1440907207983462,
+    "nb_www": -1.1263748715510713,
+    "ratio_digits_host": 1.0712473320096434,
+    "nb_slash": 0.8675797710561333,
+    "nb_underscore": -0.8221821064802971,
+    "avg_word_len": -0.7927738773048862,
+    "prefix_suffix": 0.6378795236558902,
+    "nb_dots": 0.5660338475098686,
+    "nb_and": -0.5190362077605547,
+    "query_length": 0.3622102515145857,
+    "nb_subdomains": -0.36025361577449033
+  }
+}

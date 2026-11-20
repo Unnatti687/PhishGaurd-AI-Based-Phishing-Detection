@@ -1,0 +1,5 @@
+Model,CV_F1_Mean,Test_Accuracy,Test_Precision,Test_Recall,Test_F1,Test_ROC_AUC,True_Negatives,False_Positives,False_Negatives,True_Positives,Train_Time_Sec,Inference_Latency_ms,Best_Params
+Logistic Regression,0.8302,0.8386,0.8462,0.8276,0.8368,0.9216,971,172,197,946,3.55,0.001,{'classifier__C': 1.0}
+Decision Tree,0.8452,0.8565,0.8798,0.8259,0.852,0.8842,1014,129,199,944,0.5,0.0,"{'classifier__max_depth': 14, 'classifier__min_samples_split': 5}"
+Random Forest,0.8936,0.895,0.8957,0.8941,0.8949,0.962,1024,119,121,1022,2.9,0.018,"{'classifier__max_depth': 16, 'classifier__n_estimators': 100}"
+Support Vector Machine,0.881,0.8828,0.8808,0.8854,0.8831,0.9563,1006,137,131,1012,25.22,0.287,{'classifier__C': 2.0}
