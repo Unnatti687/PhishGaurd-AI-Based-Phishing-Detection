@@ -11,8 +11,8 @@ An end-to-end, GitHub-ready machine learning system that detects phishing websit
 ---
 
 ## 👥 Authors & Academic Context
-* **Daksh Jaiswal** &mdash; Reg. No: `RA2411003030048`
 * **Unnatti Dixit** &mdash; Reg. No: `RA2411003030009`
+* **Daksh Jaiswal** &mdash; Reg. No: `RA2411003030048`
 * **Institution:** SRM Institute of Science and Technology, Kattankulathur, Chennai, India.
 
 ---
